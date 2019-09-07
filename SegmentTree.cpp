@@ -1,7 +1,8 @@
 /*
 RetTypeOfCalc :- Type of the value to be calculated over various ranges
 BaseContainer :- Type of Container over which value is to be calculated
-BaseCases :- Function returning values for the thing to be calculated over single elements. Arguments :- const BaseContainer& and index
+BaseCases :- Function returning values for the thing to be calculated over single elements. Arguments :- const BaseContainer&
+             and index of type size_t
 MergeFunc :- Function returning calculated value over some range given the outputs of its 2 half ranges , as input
 MergeFunc2 :- Same as MergeFunc, but takes a const reference to base container as 1 extra argument
 USAGE :- 
@@ -92,28 +93,39 @@ private :
         }
     }
 
-    void PointUpdateNow(size_t index, size_t range_start, size_t range_end, SegmentTreeNode* root)
+    bool PointUpdateNow(size_t index, size_t range_start, size_t range_end, SegmentTreeNode* root)
     {
     
         if(range_start==range_end)
         {   
             root->val = BaseCases(Base, index);
-            return;
+            return true;
         }
+        
+        bool check;
+        
         if(index<=(range_start+range_end)/2)
-            PointUpdateNow(index,range_start,(range_start+range_end)/2,root->left_child);
+            check = PointUpdateNow(index,range_start,(range_start+range_end)/2,root->left_child);
         else
-            PointUpdateNow(index,(range_start+range_end)/2+1,range_end,root->right_child);
+            check = PointUpdateNow(index,(range_start+range_end)/2+1,range_end,root->right_child);
         
-        if(MergeFunc2!=nullptr)
+        if(check)
         {
-            root->val = MergeFunc2(Base,root->left_child->val,root->right_child->val);
+            if(MergeFunc2!=nullptr)
+            {
+                root->val = MergeFunc2(Base,root->left_child->val,root->right_child->val);
+                return true;
+            }
+            else
+            {
+                RetTypeOfCalc x=root->val;
+                root->val = MergeFunc(root->left_child->val,root->right_child->val);
+                if(x==root->val)
+                    return false;
+                else
+                    return true;
+            }
         }
-        else
-        {
-            root->val = MergeFunc(root->left_child->val,root->right_child->val);
-        }
-        
     }
 
 public:    
@@ -139,7 +151,6 @@ public:
 
     RetTypeOfCalc RangeQuery(size_t start_idx, size_t end_idx) const
     {
-        
         return RangeQueryNow(start_idx, end_idx, beg, end, root).first;
     }
 
@@ -153,14 +164,15 @@ int BaseCases(const vector<int>& a, size_t index)
 {return a[index];}
 
 int Merge(int a, int b)
-{return max(a,b);}
+{return a+b;}
   
+
 int main(){
-    vector<int> a  {1,2,9,8,10,5};
+    vector<int> a  {2,7,9,8,10,5};
     SegmentTree1d<vector<int>,int> st(a,BaseCases,Merge,a.size()); //Segment Tree to find maximum in any range of array
     st.BuildTree();
-    cout<<st.RangeQuery(1,3);
-    st.PointUpdate(3,7);
-    cout<<st.RangeQuery(1,3);
+    cout<<st.RangeQuery(0,3)<<endl;
+    st.PointUpdate(3,10);
+    cout<<st.RangeQuery(1,3)<<endl;
 
 }
