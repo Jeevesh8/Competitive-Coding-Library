@@ -16,11 +16,13 @@ together.
 4th line prints the output of range 1 to 3, both inclusive.
 5th line updates the tree by changing the value at index 3 to 7.
 */
+#include<bits/stdc++.h>
+using namespace std;
 
-<template class BaseContainer; class RetTypeOfCalc;>
+template<class BaseContainer, class RetTypeOfCalc>
 
 class SegmentTree1d{
-    class SegmentTreeNode(){
+    class SegmentTreeNode{
         public :
             RetTypeOfCalc val;
             SegmentTreeNode* left_child;
@@ -141,10 +143,19 @@ public:
         return RangeQueryNow(start_idx, end_idx).first;
     }
 
-    SegmentTree1d& PointUpdate(size_t index, typename Base::value_type new_val){
+    SegmentTree1d& PointUpdate(size_t index, typename BaseContainer::value_type new_val){
         Base[index] = new_val;
         PointUpdateNow(index);
     }
+};
+
+int main(){
+    int BaseCases(vector<int>& a, int index){return a[index];}
+    int Merge(int a, int b){return max(a,b);}
+    vector<int> a  {1,2,3,4,5};
+    SegmentTree<vector<int>,int> st(a,BaseCases,Merge,a.size());
+    st.BuildTree();
+    cout<<st.RangeQuery(1,3);
+    st.PointUpdate(3,7);
+
 }
-
-
