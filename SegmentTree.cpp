@@ -23,6 +23,7 @@ using namespace std;
 template<class BaseContainer, class RetTypeOfCalc>
 
 class SegmentTree1d{
+    
     class SegmentTreeNode{
         public :
             RetTypeOfCalc val;
@@ -31,7 +32,18 @@ class SegmentTree1d{
             SegmentTreeNode* parent;
             SegmentTreeNode() : left_child(nullptr), right_child(nullptr), parent(nullptr){}
             SegmentTreeNode(SegmentTreeNode* x) : left_child(nullptr), right_child(nullptr), parent(x){}
+            ~SegmentTreeNode(){
+                if(left_child!=nullptr) {
+                    delete left_child;
+                    left_child=nullptr;
+                }
+                if(right_child!=nullptr){
+                    delete right_child;
+                    right_child=nullptr;
+                }
+            }
     };
+
 private :
     BaseContainer Base;
     
@@ -158,6 +170,14 @@ public:
         Base[index] = new_val;
         PointUpdateNow(index, beg, end, root);
     }
+
+    SegmentTree1d& ClearTree(){
+        delete root;
+    }
+    
+    ~SegmentTree1d(){
+        delete root;
+    }
 };
 
 int BaseCases(const vector<int>& a, size_t index)
@@ -174,5 +194,5 @@ int main(){
     cout<<st.RangeQuery(0,3)<<endl;
     st.PointUpdate(3,10);
     cout<<st.RangeQuery(1,3)<<endl;
-
+    st.ClearTree();
 }
