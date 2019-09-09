@@ -107,7 +107,7 @@ private :
 
     bool PointUpdateNow(size_t index, size_t range_start, size_t range_end, SegmentTreeNode* root)
     {
-    
+        
         if(range_start==range_end)
         {   
             root->val = BaseCases(Base, index);
@@ -130,14 +130,15 @@ private :
             }
             else
             {
-                RetTypeOfCalc x=root->val;
-                root->val = MergeFunc(root->left_child->val,root->right_child->val);
+                RetTypeOfCalc x = root->val;
+                root->val = MergeFunc((root->left_child)->val,(root->right_child)->val);
                 if(x==root->val)
                     return false;
                 else
                     return true;
             }
         }
+        return true;
     }
 
 public:    
@@ -169,10 +170,12 @@ public:
     SegmentTree1d& PointUpdate(size_t index, typename BaseContainer::value_type new_val){
         Base[index] = new_val;
         PointUpdateNow(index, beg, end, root);
+        return *this;
     }
 
     SegmentTree1d& ClearTree(){
         delete root;
+        return *this;
     }
     
     ~SegmentTree1d(){
