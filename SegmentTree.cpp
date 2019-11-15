@@ -57,7 +57,7 @@ private :
     
     SegmentTreeNode* root;
 
-    RetTypeOfCalc BuildTreeNow(SegmentTreeNode* root, size_t start_idx, size_t end_idx)
+    RetTypeOfCalc BuildTreeNow(SegmentTreeNode* root, size_t start_idx, size_t end_idx)   
     {
         
         if(start_idx==end_idx)
@@ -178,6 +178,17 @@ public:
         return *this;
     }
     
+    SegmentTree1d& ChangeBase(BaseContainer& NewBase, size_t size_, size_t a=0){
+        ClearTree();
+        root = nullptr;
+        root = new SegmentTreeNode();
+        end = size_-1;
+        beg = a;
+        Base = NewBase;
+        BuildTreeNow(root, beg, end);
+        return *this;
+    }
+
     ~SegmentTree1d(){
         delete root;
     }
@@ -191,11 +202,22 @@ int Merge(int a, int b)
   
 
 int main(){
+    
     vector<int> a  {2,7,9,8,10,5};
+    vector<int> b  {1,2,3,45,54};
+    
     SegmentTree1d<vector<int>,int> st(a,BaseCases,Merge,a.size()); //Segment Tree to find maximum in any range of array
     st.BuildTree();
+    
     cout<<st.RangeQuery(0,3)<<endl;
+    
     st.PointUpdate(3,10);
+    
     cout<<st.RangeQuery(1,3)<<endl;
-    st.ClearTree();
+    
+    //st.ClearTree();
+    
+    st.ChangeBase(b, b.size());
+    cout<<st.RangeQuery(2,3)<<endl;
+
 }
