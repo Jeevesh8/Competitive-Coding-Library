@@ -288,6 +288,7 @@ T lucas_thm(T n, T r, T p)
     {
         ans = ( ans*nCr_modp(n_i[i], r_i[i], p) )%p;
     }
+    return ans;
 }
 
 /*
