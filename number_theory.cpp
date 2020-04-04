@@ -230,5 +230,6 @@ vector<T> euler_phi_range(T n)
         i+=2;
         if(euler_phi[i]==i)         for(size_t j=i; j<=n; j+=i)     euler_phi[j] = (euler_phi[j]*(j-1)) /j;
     }
+    return euler_phi;
 }
 
