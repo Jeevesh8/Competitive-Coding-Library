@@ -233,3 +233,70 @@ vector<T> euler_phi_range(T n)
     return euler_phi;
 }
 
+
+template<typename T>
+vector<T> nCr_modp(T n, T r, T p)
+{
+    /*
+    Returns nCr%p
+    */
+    vector<T> C(r+1);
+    C.clear();
+    C[0]=1;
+    for(T i=0; i<=n; ++i)
+    {
+        for(size_t j=min(i,r); j>0; --j)
+            C[j] = (C[j]+C[j-1])%p;
+    }
+    return C[r];
+}
+
+
+
+
+template<typename T>
+vector<T> change_base(T num, T new_base)
+{
+    /*
+    Returns vector having representation of base 10 num changed to new_base
+    ans[i] is to be multiplied by p^i to get the number back
+    */
+    vector<T> ans;
+    T hold;
+    while(num>0)
+    {
+        hold = num%new_base;
+        ans.push_back(hold);
+        num-=hold;
+        num/=new_base;
+    }
+    return ans;
+}
+
+
+template<typename T>
+T lucas_thm(T n, T r, T p)
+{
+    /*
+    Calculates nCr %p for big n, r
+    p must be prime
+    */
+    vector<T> n_i = change_base(n, p);
+    vector<T> r_i = change_base(r, p);
+    T ans = 1;
+    for(size_t i=0;i<n_i.size();++i)
+    {
+        ans = ( ans*nCr_modp(n_i[i], r_i[i], p) )%p;
+    }
+}
+
+/*
+SOME THEOREMS:-
+p is prime for 1, 2
+1.)Wilson :- (p-1)! == -1(mod p)
+2.)Fermat's Little theorem :- a^p == a (mod p)  or    a^(p-1) == 1 (mod p)
+3.)Euler-Fermat Theorem :-  a^euler_phi(m) == 1(mod m),  if GCD(a,m)=1
+
+All three are based on rotations induced on the residue sets (corres. to some n modulo).
+*/
+
