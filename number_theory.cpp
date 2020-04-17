@@ -49,6 +49,7 @@ T modulo_inverse(T a, T m)
     /*
     Finds modulo inverse of a w.r.t. m.
     GCD(a,m) must be 1.
+    output<=a; Add %m in return statement's end if you want to guarantee output<=m
     */
     return extended_euclid( make_pair(a, -m) ).first;
 }
@@ -138,4 +139,165 @@ vector<bool> segmented_sieve(T a, T b)
     }
     return isPrime;
 }
+
+
+template<typename T>
+T chinese_rem_thm(vector<T> divisors, vector<T> remainders)
+{
+    /*
+    Returns a number such that when divided by divisors[i], it gives the remainder remainders[i] for all i.
+    pp[j] must be coprime with prod , for all j; i.e. all divisors must be coprime with one another.
+    */
+    vector<T> pp(divisors.size());
+    vector<T> inv(divisors.size());
+    T prod=1;
+    T ans=0;
+    for(size_t i=0;i<divisors.size();++i)       prod*=divisors[i];
+    for(size_t j=1;j<divisors.size();++j)       
+    {
+        pp[j] = prod/divisors[j];     
+        inv[j] = modulo_inverse(pp[j], divisors[j])%divisors[j];
+        ans += ( pp[j]*inv[j]*remainders[j] ) %prod;
+        ans %= prod;
+    }
+    return ans;
+}
+
+template<typename T>
+pair<vector<T>, vector<T>> prime_factorise(T number)
+{
+    vector<T> prime_factors;
+    vector<T> powers;
+    T limit = floor(sqrt(number));
+
+    for(size_t i=2,write_loc=-1;number>=1&&i<limit;++i)
+    {
+        if(bool_sieve[i])
+        {
+            if(number%i==0)
+            {    
+                prime_factors.push_back(i);
+                powers.push_back(1);
+                write_loc+=1;
+                number /= i;
+            }
+            
+            while(number%i==0)
+            {
+                powers[write_loc]+=1;
+                number /= i;
+            }
+        }
+    }
+    
+    return make_pair(prime_factors, powers) 
+}
+
+template<typename T>
+T euler_phi(T n)
+{
+    /*
+    Returns number of integer x in [1,n) such that GCD(x,n)=1 
+    Time Complexity :- <=sqrt(n)*logn*logn
+    */
+    T ans=n;
+    vector<T> prime_factors = prime_factorise(n).first;
+    for(size_t i=0; i<prime_factors.size(); ++i)
+    {
+        ans*= (prime_factors[i]-1)/prime_factors[i];
+    }
+    return ans;     
+}
+
+template<typename T>
+vector<T> euler_phi_range(T n)
+{
+    /*
+    Computes euler phi function for all numbers in [0,n]
+    */
+    vector<T> euler_phi(n+1);
+    euler_phi[0]=0; euler_phi[1]=0;
+    for(size_t i=2; i<=n; ++i)
+    {
+        euler_phi[i] = i;
+    }
+    for(size_t i=2; i<=n; i+=2)      euler_phi[i] = euler_phi[i]/2;
+    for(size_t i=3; i<=n; i+=3)      euler_phi[i] = (euler_phi[i]*2)/3;
+
+    for(size_t i=5; i<=n; i+=4)
+    {
+        if(euler_phi[i]==i)         for(size_t j=i; j<=n; j+=i)     euler_phi[j] = (euler_phi[j]*(j-1)) /j;
+        i+=2;
+        if(euler_phi[i]==i)         for(size_t j=i; j<=n; j+=i)     euler_phi[j] = (euler_phi[j]*(j-1)) /j;
+    }
+    return euler_phi;
+}
+
+
+template<typename T>
+vector<T> nCr_modp(T n, T r, T p)
+{
+    /*
+    Returns nCr%p
+    */
+    vector<T> C(r+1);
+    C.clear();
+    C[0]=1;
+    for(T i=0; i<=n; ++i)
+    {
+        for(size_t j=min(i,r); j>0; --j)
+            C[j] = (C[j]+C[j-1])%p;
+    }
+    return C[r];
+}
+
+
+
+
+template<typename T>
+vector<T> change_base(T num, T new_base)
+{
+    /*
+    Returns vector having representation of base 10 num changed to new_base
+    ans[i] is to be multiplied by p^i to get the number back
+    */
+    vector<T> ans;
+    T hold;
+    while(num>0)
+    {
+        hold = num%new_base;
+        ans.push_back(hold);
+        num-=hold;
+        num/=new_base;
+    }
+    return ans;
+}
+
+
+template<typename T>
+T lucas_thm(T n, T r, T p)
+{
+    /*
+    Calculates nCr %p for big n, r
+    p must be prime
+    */
+    vector<T> n_i = change_base(n, p);
+    vector<T> r_i = change_base(r, p);
+    T ans = 1;
+    for(size_t i=0;i<n_i.size();++i)
+    {
+        ans = ( ans*nCr_modp(n_i[i], r_i[i], p) )%p;
+    }
+    return ans;
+}
+
+/*
+SOME THEOREMS:-
+p is prime for 1, 2
+1.)Wilson :- (p-1)! == -1(mod p)
+2.)Fermat's Little theorem :- a^p == a (mod p)  or    a^(p-1) == 1 (mod p)
+3.)Euler-Fermat Theorem :-  a^euler_phi(m) == 1(mod m),  if GCD(a,m)=1
+
+All three are based on rotations induced on the residue sets (corres. to some n modulo).
+*/
 
