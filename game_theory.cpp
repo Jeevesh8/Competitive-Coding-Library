@@ -8,7 +8,7 @@ template<typename T>
 T calculateMex(set<T> s)
 {
     T mex = 0;
-    while(s.find(mex) != set.end())
+    while(s.find(mex) != s.end())
         mex++;
     return mex;
 }
