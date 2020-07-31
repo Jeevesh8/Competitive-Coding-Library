@@ -6,6 +6,7 @@ using namespace std;
 
 #define n_infty(t) -numeric_limits<t>::infinity()
 #define p_infty(t) +numeric_limits<t>::infinity()
+#define lli long long int
 
 
 // Rod Cutting Problem
@@ -114,3 +115,53 @@ pair<costType, elemType> mat_chain_mul( vector<elemType>& chain,
 }
 
 
+//Longest Increasing Sub-sequence
+template<typename T>
+lli longest_increasing_subsequence(vector<T>& seq, size_t end=-1)
+{
+    static vector<lli> dp( seq.size(), 0 ) ;
+
+    if(end==0)      return 1 ;
+    if(dp[end]!=0)  return dp[end] ;
+
+    if(end==-1)         end = seq.size()-1 ; 
+    
+    lli longest_inc_length = 0 ;                            //Length of longest increasing sub-sequence ending at "end"
+
+    for(size_t i=0; i<end-1; ++i)
+    {
+        if(seq[i]<seq[end])
+            longest_inc_length = max( longest_inc_length, longest_increasing_subsequence(seq, i) + 1 ) ;
+    }
+    dp[end] = longest_inc_length ;
+    
+    if( end==seq.size()-1 )
+        return max(dp) ;
+    return longest_inc_length ;
+}
+
+//Longest Common Sub-sequnece
+template<typename T>
+lli longest_common_subsequnece(vector<T>& seq1, vector<T>& seq2, size_t end_seq1=-2, size_t end_seq2=-2)
+{
+    static vector<vector<lli>> dp( seq1.size(), vector<lli> (seq2.size(), 0) ) ;
+
+    if(end_seq1==-1 or end_seq2==-1)    return 0 ;
+    
+    if(dp[end_seq1][end_seq2]!=0)       return dp[end_seq1][end_seq2] ;
+
+    if(end_seq1==-2)
+    {
+        end_seq1 = seq1.size()-1 ;
+        end_seq2 = seq2.size()-1 ;
+    }
+
+    lli lcs_len = 0 ;
+
+    lcs_len = max(  longest_common_subsequnece(seq1, seq2, end_seq1-1, end_seq2) ,
+                    longest_common_subsequnece(seq1, seq2, end_seq1, end_seq2-1) ,
+                    longest_common_subsequnece(seq1, seq2, end_seq1-1, end_seq2-1) + (seq1[end_seq1]==seq2[end_seq2]) ) ;
+    
+    dp[end_seq1][end_seq2] = lcs_len ;
+    return lcs_len ;
+}
