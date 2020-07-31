@@ -2,6 +2,7 @@
 #include<vector>
 #include<cmath>
 #include<limits>
+#include<map>
 using namespace std;
 
 #define n_infty(t) -numeric_limits<t>::infinity()
@@ -164,4 +165,59 @@ lli longest_common_subsequnece(vector<T>& seq1, vector<T>& seq2, size_t end_seq1
     
     dp[end_seq1][end_seq2] = lcs_len ;
     return lcs_len ;
+}
+
+
+// 0/1 Knapsack Problem
+template<typename price_t, typename weight_t>
+price_t knapsack( vector<price_t>& item_values, vector<weight_t>& item_weights, weight_t capacity, size_t start=0)
+{
+    static map< pair< size_t, weight_t >, price_t > dp;
+
+    if(capacity == 0 or start >= item_values.size())  return 0 ;
+
+    pair< size_t, weight_t > cur = make_pair(start, capacity) ;
+
+    auto it = dp.find(cur) ;                //O( log(|dp|) )
+    if(it!=dp.end())    return dp[it] ;
+
+    if( capacity >= item_weights[i] )
+    {
+        dp[cur] = max(  knapsack(item_values, item_weights, capacity-item_weights[i], start+1) + item_values[start] , 
+                        knapsack(item_values, item_weights, capacity, start+1) ) ; 
+    }
+    else
+        dp[cur] = knapsack(item_values, item_weights, capacity, start+1) ;
+
+    return dp[cur] ;    
+}
+
+//Edit Distance 
+template<typename T, typename n_ops_t>
+n_ops_t edit_distance(vector<T>& str1, vector<T>& str2, size_t n=-2, size_t m=-2)
+{
+    /*
+    Assuming cost of all types of operations(Remove/Insert/Replace) is 1.
+    */
+    if(n==-2)
+    {
+        n = str1.size()-1 ;
+        m = str2.size()-1 ;
+    }
+
+    static vector<vector<n_ops_t>> dp(n+1, vector<n_ops_t> (m+1, p_infty(n_ops_t))) ;
+
+    if(n==-1 && m!=-1)   return m+1 ;
+    if(m==-1 && n!=-1)   return n+1 ;
+    if(m==-1 && n==-1)   return 0 ;
+
+    if(!isinf(dp[n][m]))    return dp[n][m] ;
+    
+    if(str1[m]==str2[n])
+        dp[n][m] = edit_distance(str1, str2, n-1, m-1) ;
+    else
+        dp[n][m] = 1 + min( edit_distance(str1, str2, n, m-1),              //Remove
+                            edit_distance(str1, str2, n-1, m),              //Insert
+                            edit_distance(str1, str2, n-1, m-1))            //Replace
+    return dp[n][m] ;
 }
