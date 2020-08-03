@@ -302,3 +302,21 @@ void bellman_ford( node_t* source, size_t N ){
         }            
     }
 }
+
+
+//All Pair Shortest path (Floyd-Warshall Algo)
+template<typename dist_t>
+vector<vector<dist_t>>& floyd_warshall(vector<vector<dist_t>>& adj_mat)
+{
+    /*
+    Much Better than running Bellman-Ford N times, if graph is not so sparse(E^2>V). O(V-cube). Running bellman ford V times = O((VE)^2)
+    If adjacency matrix not available , use get_adjacency_matrix() of graph_utils.cpp
+    */
+    for(size_t k=0; k<adj_mat[0].size(); ++k)
+        for(size_t i=0; i<adj_mat[0].size(); ++i)
+            for(size_t j=0; j<adj_mat[0].size(); ++j)
+                if(! (isinf(adj_mat[i][k])||isinf(adj_mat[j][k])) )
+                    adj_mat[i][j] = min(adj_mat[i][j], adj_mat[i][k]+adj_mat[k][j]) ;
+    return adj_mat ;
+}
+
