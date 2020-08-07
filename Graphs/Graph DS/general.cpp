@@ -23,9 +23,9 @@ class node{
             for(size_t j=0; j<neighbor.size(); ++j)
             {
                 neighbors.push_back( &node(neighbor[j]) ) ;
-                edges.push_back( &edge( weight, directed, this, neighbors[j] ) ) ;
+                edges.push_back( new edge( weight, directed, this, neighbors[j] ) ) ;
                 if(!directed)   
-                    neighbors[j]->edges.push_back( &edge( weight, directed, neighbors[j], this ) ) ; 
+                    neighbors[j]->edges.push_back( new edge( weight, directed, neighbors[j], this ) ) ; 
             }
         }
         vector<edge*>& get_edge_iter() { return edges ; }            
@@ -44,4 +44,3 @@ class edge{
         { visited = false; }
 
 };
-
