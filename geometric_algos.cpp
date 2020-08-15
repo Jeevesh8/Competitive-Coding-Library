@@ -72,7 +72,7 @@ bool is_inside(vector<point_t>& polygon, point_t p)
     return count&1 ;
 }
 
-//Convex-Hull Using Graham-Scan
+//Convex-Hull Using Graham-Scan . Time complexity = O(nlogn)
 vector<point_t>& convex_hull(vector<point_t>& points)
 {
     if(points.size()<=3)    return points ;
