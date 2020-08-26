@@ -301,3 +301,19 @@ p is prime for 1, 2
 All three are based on rotations induced on the residue sets (corres. to some n modulo).
 */
 
+template<typename T>
+T fast_modular_exponentiation(T a, T exp, T p)
+{
+    /* Calculates (a^exp) %p */
+    if(exp&1)
+    {
+        if (p==1)
+            return fast_modular_exponentiation(a, exp-1, p)*a;
+        else
+            return (fast_modular_exponentiation(a, exp-1, p)*a)%p;
+    }    
+    if (p==1)
+        return fast_modular_exponentiation(a, exp/2, p)*fast_modular_exponentiation(a, exp/2, p);
+    else
+        return (fast_modular_exponentiation(a, exp-1, p)*fast_modular_exponentiation(a, exp/2, p))%p;
+}
